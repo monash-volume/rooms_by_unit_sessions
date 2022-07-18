@@ -1,0 +1,113 @@
+<!doctype html>
+
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Schedule</title>
+		<meta name="description" content="Schedule">
+		<meta name="author" content="Peter Jolly">
+	</head>
+
+	<style>
+		iframe {
+			display: block;
+			background: #fff;
+			border: none;
+			overflow:hidden;
+			overflow-x:hidden;
+			overflow-y:hidden;
+			height:150%;
+			width:150%;
+			position:absolute;
+			top:-30px;
+			left:0px;
+			right:0px;
+			bottom:0px
+		}
+		#time {
+			position:absolute;
+			right:0px;
+			top:0px;
+			padding-right:280px;
+			padding-top:14px;
+			display:block;
+			z-index:100;
+			font-family:arial;
+			font-weight:700;
+			color:#333;
+			font-size:44px;
+		}
+	</style>
+
+	<body style="margin:0px;padding:0px;overflow:hidden">
+		<div id="time"></div>
+		<div id="iframe-frame">
+			<iframe id="google_Sheet_1"
+				src="https://docs.google.com/spreadsheets/d/e/2PACX-1vT54whBsAtMUmBJCBCVgv_b-xVv4JL4h8j7JpS5yW36PNPjDxggAaTgEL7LO94ZK5wWdkzFohAc52Py/pubhtml?gid=171420821&single=true"
+				frameborder="0"
+				style="z-index: 1;"
+				height="150%"
+				width="150%">
+			</iframe>
+			<!-- <iframe
+				id="google_Sheet_2"
+				src="https://docs.google.com/spreadsheets/d/e/2PACX-1vT54whBsAtMUmBJCBCVgv_b-xVv4JL4h8j7JpS5yW36PNPjDxggAaTgEL7LO94ZK5wWdkzFohAc52Py/pubhtml?gid=1627593857&single=true"
+				frameborder="0"
+				style="z-index: -1;"
+				height="150%"
+				width="150%">
+			</iframe> -->
+		</div>
+	</body>
+
+	<script>
+
+		//DISPLAY DATE AND TIME
+		var today = new Date();
+		function formatAMPM(date) {
+		  var hours = date.getHours();
+		  var minutes = date.getMinutes();
+		  var ampm = hours >= 12 ? 'pm' : 'am';
+		  hours = hours % 12;
+		  hours = hours ? hours : 12; // the hour '0' should be '12'
+		  minutes = minutes < 10 ? '0'+minutes : minutes;
+		  var strTime = hours + ':' + minutes + ampm;
+		  return strTime;
+		}
+
+		document.getElementById('time').innerHTML=formatAMPM(today);
+		setInterval(function(){ var today = new Date(); document.getElementById('time').innerHTML=formatAMPM(today); }, 5000);
+
+		const API_KEY = "AIzaSyBI7metaTzgqtgoeJGcYCbh6SEc8839qaw"
+		const SPREADSHEET_ID = "1HnJkJ81pMYCsSeCuVn1k_ZfJvLl7L9USxGbYgaolCNE"
+		const SHEET_NAME = encodeURIComponent("Landscape 1080p - Page 2")
+		const PAGE_2_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}/?key=${API_KEY}`
+
+		const PAGE_1 = document.getElementById('google_Sheet_1')
+		const PAGE_2 = document.getElementById('google_Sheet_2')
+
+		async function checkPage2() {
+			return await fetch(PAGE_2_URL)
+				.then(response => response.json())
+				.then(data => data.values.length > 2)
+		}
+
+		setInterval(() => {
+				document.getElementById('google_Sheet_1').src += '';
+				document.getElementById('google_Sheet_2').src += '';
+			}, 120000);
+
+		checkPage2()
+			.then(check => {
+				if (check) {
+					setInterval(() => {
+						PAGE_1.style.zIndex = -1*parseInt(PAGE_1.style.zIndex);
+						PAGE_2.style.zIndex = -1*parseInt(PAGE_2.style.zIndex);
+						console.log("switch")
+					}, 10000);
+		  		}
+		  	})
+	</script>
+
+</html>
